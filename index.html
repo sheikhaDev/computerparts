@@ -1,782 +1,986 @@
-<!doctype html>
-<html lang="ar" dir="rtl" class="h-full">
- <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <script src="/_sdk/element_sdk.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet">
-  <style>
-  * { font-family: 'Noto Kufi Arabic', sans-serif; }
-  html, body { height: 100%; margin: 0; }
-  .page { display: none; }
-  .page.active { display: flex; }
-  .card-hover { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-  .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-  .fade-in { animation: fadeIn 0.6s ease 0.1s both; }
-  @keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-  @keyframes pop { 0% { transform:scale(0) rotate(-180deg); } 60% { transform:scale(1.15); } 100% { transform:scale(1) rotate(0); } }
-  .pop { animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
-  @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-12px); } }
-  .float { animation: float 4s ease-in-out infinite; }
-  @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 20px rgba(245,158,11,0.4); } 50% { box-shadow: 0 0 40px rgba(245,158,11,0.8); } }
-  .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-  .progress-fill { transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
-  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-  .badge-shimmer { background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 50%, #f59e0b 100%); background-size: 200% 100%; animation: shimmer 2.5s ease-in-out infinite; }
-  @keyframes bounce-in { 0% { transform: scale(0.3) translateY(20px); opacity:0; } 50% { opacity:1; } 100% { transform: scale(1) translateY(0); } }
-  .bounce-in { animation: bounce-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
-  .drag-item { cursor: grab; user-select: none; transition: all 0.2s; }
-  .drag-item:active { cursor: grabbing; transform: scale(1.08) rotate(3deg); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-  .drop-zone { transition: all 0.3s; }
-  .drop-zone.drag-over { border-color: #f59e0b !important; background: #fffbeb !important; transform: scale(1.02); box-shadow: 0 0 20px rgba(245,158,11,0.3); }
-  @keyframes slideIn { 0% { transform: translateX(100%); opacity:0; } 100% { transform: translateX(0); opacity:1; } }
-  .slide-in { animation: slideIn 0.5s ease; }
-  </style>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>رحلة استكشاف مكونات الحاسوب</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
   <script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        inputGreen: '#22c55e',
-        outputBlue: '#3b82f6',
-        actionYellow: '#f59e0b',
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            inputGreen: "#22c55e",
+            outputBlue: "#3b82f6",
+            actionYellow: "#f59e0b",
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    * {
+      font-family: "Noto Kufi Arabic", sans-serif;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      background: #f9fafb;
+      color: #1f2937;
+      overflow: hidden;
+    }
+
+    .page {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    .page.active {
+      display: flex;
+    }
+
+    .card-hover {
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .card-hover:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    }
+
+    .fade-in {
+      animation: fadeIn 0.55s ease both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .float {
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .progress-fill {
+      transition: width 0.5s ease;
+    }
+
+    .drag-item {
+      cursor: grab;
+      user-select: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .drag-item:active {
+      cursor: grabbing;
+      transform: scale(1.05);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+    }
+
+    .drop-zone {
+      transition: all 0.25s ease;
+    }
+
+    .drop-zone.drag-over {
+      border-color: #f59e0b !important;
+      background: #fffbeb !important;
+      transform: scale(1.02);
+    }
+
+    .hide-scrollbar::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="h-screen w-screen flex flex-col overflow-hidden">
+
+    <!-- Top Bar -->
+    <header
+      id="topBar"
+      class="hidden w-full bg-gradient-to-r from-blue-50 to-green-50 shadow-md px-4 py-3 items-center justify-between z-20 border-b-2 border-yellow-200"
+    >
+      <div class="flex items-center gap-3">
+        <span id="pointsDisplay" class="bg-yellow-200 text-yellow-800 font-bold px-4 py-2 rounded-full text-sm shadow-md">⭐ 0 نقطة</span>
+        <span id="levelDisplay" class="bg-blue-200 text-blue-800 font-bold px-4 py-2 rounded-full text-sm shadow-md">🎖️ المستوى 1</span>
+      </div>
+
+      <div class="flex-1 mx-4 max-w-xs">
+        <div class="h-3 bg-gray-300 rounded-full overflow-hidden shadow-md">
+          <div
+            id="progressBar"
+            class="h-full bg-gradient-to-r from-green-400 via-yellow-400 to-orange-400 rounded-full progress-fill"
+            style="width: 0%;"
+          ></div>
+        </div>
+      </div>
+
+      <span id="pageIndicator" class="text-xs text-gray-600 font-bold bg-white px-3 py-1 rounded-full shadow-sm"></span>
+    </header>
+
+    <!-- Toast -->
+    <div
+      id="pointsToast"
+      class="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-yellow-400 to-orange-400 text-white font-black px-6 py-3 rounded-full shadow-2xl text-lg border-2 border-yellow-300 hidden"
+    >
+      +10 ⭐
+    </div>
+
+    <!-- PAGE 1 -->
+    <section id="page1" class="page active flex-col items-center justify-center fade-in" style="background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 50%, #fefce8 100%);">
+      <div class="text-center px-6 max-w-2xl mx-auto">
+        <div class="float mb-6 text-7xl">💻</div>
+        <h1 class="text-3xl md:text-5xl font-black text-gray-800 leading-relaxed mb-3">
+          رحلة استكشاف مكونات الحاسوب
+        </h1>
+        <p class="text-lg text-gray-500 mb-2">(أجهزة الإدخال والإخراج)</p>
+        <p class="text-sm text-gray-400 mb-8">الصف الخامس – تقنية المعلومات</p>
+        <button
+          id="startBtn"
+          onclick="goToPage(2); showTopBar();"
+          class="bg-actionYellow hover:bg-yellow-500 text-white font-bold px-8 py-3 rounded-full shadow-lg text-lg transition hover:scale-105 active:scale-95"
+        >
+          ابدأ الرحلة 🚀
+        </button>
+      </div>
+    </section>
+
+    <!-- PAGE 2 -->
+    <section id="page2" class="page flex-col items-center overflow-y-auto hide-scrollbar fade-in">
+      <div class="max-w-3xl mx-auto px-5 py-8 w-full">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-700">📖 دليل الاستخدام</h2>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm">
+            <span class="text-3xl">👆</span>
+            <span class="text-sm">اضغط على الأزرار للتنقل بين الصفحات</span>
+          </div>
+
+          <div class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm">
+            <span class="text-3xl">⭐</span>
+            <span class="text-sm">اجمع النقاط من الأنشطة والإجابات الصحيحة</span>
+          </div>
+
+          <div class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm">
+            <span class="text-3xl">🏆</span>
+            <span class="text-sm">أكمل الرحلة واحصل على شارة خبير الحاسوب</span>
+          </div>
+
+          <div class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm">
+            <span class="text-3xl">🎮</span>
+            <span class="text-sm">استمتع بالألعاب والأنشطة التفاعلية</span>
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-8">
+          <button onclick="goToPage(1); hideTopBar();" class="text-gray-400 text-sm">⟩ السابق</button>
+          <button onclick="goToPage(3); addPoints(5);" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">
+            التالي ⟨
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 3 -->
+    <section id="page3" class="page flex-col items-center overflow-y-auto hide-scrollbar fade-in">
+      <div class="max-w-3xl mx-auto px-5 py-8 w-full text-center">
+        <div class="bg-white rounded-3xl p-6 shadow-lg mb-6">
+          <div class="text-5xl mb-4">🤔</div>
+          <h2 class="text-2xl font-bold text-gray-700 mb-3">هل تعرف كيف يعمل الحاسوب؟</h2>
+          <p class="text-sm text-gray-500 leading-relaxed mb-5">
+            كيف نُدخل المعلومات إليه؟ وكيف يُظهر لنا النتائج؟
+          </p>
+
+          <div class="flex justify-center">
+            <div class="flex items-center gap-4 text-3xl md:text-4xl">
+              <span>⌨️</span>
+              <span class="text-yellow-500">→</span>
+              <span>💻</span>
+              <span class="text-yellow-500">→</span>
+              <span>🖥️</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-sm text-gray-400">هيا نكتشف معاً! 🌟</p>
+
+        <div class="flex justify-between mt-6">
+          <button onclick="goToPage(2)" class="text-gray-400 text-sm">⟩ السابق</button>
+          <button onclick="goToPage(4)" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">
+            التالي ⟨
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 4 -->
+    <section id="page4" class="page flex-col items-center overflow-y-auto hide-scrollbar fade-in">
+      <div class="max-w-3xl mx-auto px-5 py-8 w-full">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-700">📋 محتويات الرحلة</h2>
+
+        <div class="space-y-3">
+          <button onclick="goToPage(6)" class="w-full text-right bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-3 text-sm">
+            <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs">1</span>
+            أهداف التعلم
+          </button>
+
+          <button onclick="goToPage(7)" class="w-full text-right bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-3 text-sm">
+            <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs">2</span>
+            ما هو الحاسوب؟
+          </button>
+
+          <button onclick="goToPage(8)" class="w-full text-right bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-3 text-sm">
+            <span class="bg-green-100 text-green-600 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs">3</span>
+            أجهزة الإدخال
+          </button>
+
+          <button onclick="goToPage(9)" class="w-full text-right bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-3 text-sm">
+            <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs">4</span>
+            أجهزة الإخراج
+          </button>
+
+          <button onclick="goToPage(10)" class="w-full text-right bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-3 text-sm">
+            <span class="bg-purple-100 text-purple-600 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs">5</span>
+            مقارنة بين الإدخال والإخراج
+          </button>
+
+          <button onclick="goToPage(11)" class="w-full text-right bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-3 text-sm">
+            <span class="bg-yellow-100 text-yellow-600 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs">6</span>
+            أسئلة تفاعلية
+          </button>
+
+          <button onclick="goToPage(13)" class="w-full text-right bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-3 text-sm">
+            <span class="bg-yellow-100 text-yellow-600 w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs">7</span>
+            لعبة التصنيف
+          </button>
+        </div>
+
+        <div class="flex justify-between mt-6">
+          <button onclick="goToPage(3)" class="text-gray-400 text-sm">⟩ السابق</button>
+          <button onclick="goToPage(5)" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">
+            التالي ⟨
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 5 -->
+    <section id="page5" class="page flex-col items-center overflow-y-auto hide-scrollbar fade-in">
+      <div class="max-w-4xl mx-auto px-5 py-8 w-full text-center">
+        <h2 class="text-2xl font-bold mb-6 text-gray-700">🎬 فيديو تعليمي</h2>
+
+        <div class="bg-gray-900 rounded-2xl overflow-hidden shadow-lg mb-4">
+          <iframe
+            class="w-full aspect-video"
+            src="https://www.youtube.com/embed/45LtBSwxfcU"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+
+        <p class="text-xs text-gray-400">تم إضافة الفيديو داخل الدرس بشكل مباشر</p>
+
+        <div class="flex justify-between mt-6">
+          <button onclick="goToPage(4)" class="text-gray-400 text-sm">⟩ السابق</button>
+          <button onclick="goToPage(6)" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">
+            التالي ⟨
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 6 -->
+    <section id="page6" class="page flex-col items-center overflow-y-auto hide-scrollbar fade-in">
+      <div class="max-w-3xl mx-auto px-5 py-8 w-full">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-700">🎯 أهداف التعلم</h2>
+
+        <div class="space-y-4">
+          <div class="bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300 rounded-2xl p-5 card-hover shadow-md">
+            <div class="flex items-start gap-4">
+              <span class="text-3xl bg-green-200 w-14 h-14 rounded-full flex items-center justify-center">1️⃣</span>
+              <div>
+                <p class="font-bold text-green-700 text-sm mb-1">التعرف على أجهزة الإدخال</p>
+                <p class="text-xs text-gray-600">لوحة المفاتيح، الماوس، الميكروفون، الكاميرا وفهم وظائفها</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-r from-blue-100 to-cyan-100 border-2 border-blue-300 rounded-2xl p-5 card-hover shadow-md">
+            <div class="flex items-start gap-4">
+              <span class="text-3xl bg-blue-200 w-14 h-14 rounded-full flex items-center justify-center">2️⃣</span>
+              <div>
+                <p class="font-bold text-blue-700 text-sm mb-1">التعرف على أجهزة الإخراج</p>
+                <p class="text-xs text-gray-600">الشاشة، السماعات، الطابعة، جهاز العرض وكيفية عملها</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-2xl p-5 card-hover shadow-md">
+            <div class="flex items-start gap-4">
+              <span class="text-3xl bg-yellow-200 w-14 h-14 rounded-full flex items-center justify-center">3️⃣</span>
+              <div>
+                <p class="font-bold text-yellow-700 text-sm mb-1">التمييز بين الإدخال والإخراج</p>
+                <p class="text-xs text-gray-600">فهم الفرق العملي بينهما ودورهما في معالجة البيانات</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6">
+          <button onclick="goToPage(5)" class="text-gray-400 text-sm">⟩ السابق</button>
+          <button onclick="goToPage(7); addPoints(5);" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">
+            التالي ⟨
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 7 -->
+    <section id="page7" class="page flex-col items-center overflow-y-auto hide-scrollbar fade-in">
+      <div class="max-w-3xl mx-auto px-5 py-8 w-full text-center">
+        <h2 class="text-2xl font-bold mb-6 text-gray-700">💻 ما هو الحاسوب؟</h2>
+
+        <div class="bg-white rounded-3xl p-6 shadow-sm mb-4">
+          <div class="flex justify-center items-center gap-4 text-2xl md:text-4xl mb-5">
+            <span class="bg-green-100 px-4 py-3 rounded-xl">⌨️ إدخال</span>
+            <span class="text-yellow-500 font-bold">→</span>
+            <span class="bg-yellow-100 px-4 py-3 rounded-xl">⚙️ معالجة</span>
+            <span class="text-yellow-500 font-bold">→</span>
+            <span class="bg-blue-100 px-4 py-3 rounded-xl">🖥️ إخراج</span>
+          </div>
+
+          <p class="text-sm text-gray-600 leading-relaxed">
+            الحاسوب جهاز إلكتروني يستقبل البيانات <strong class="text-green-600">(إدخال)</strong>،
+            ثم يعالجها <strong class="text-yellow-600">(معالجة)</strong>،
+            وبعد ذلك يُظهر النتائج <strong class="text-blue-600">(إخراج)</strong>.
+          </p>
+        </div>
+
+        <div class="flex justify-between mt-6">
+          <button onclick="goToPage(6)" class="text-gray-400 text-sm">⟩ السابق</button>
+          <button onclick="goToPage(8); addPoints(10);" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">
+            التالي ⟨
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 8 -->
+    <section id="page8" class="page flex-col items-center overflow-y-auto hide-scrollbar fade-in">
+      <div class="max-w-3xl mx-auto px-5 py-8 w-full">
+        <h2 class="text-2xl font-bold text-center mb-2 text-green-600">🟢 أجهزة الإدخال</h2>
+        <p class="text-center text-xs text-gray-400 mb-5">تنقل البيانات إلى الحاسوب</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-4 text-center card-hover">
+            <div class="text-4xl mb-2">⌨️</div>
+            <p class="font-bold text-green-700 text-sm">لوحة المفاتيح</p>
+            <p class="text-xs text-gray-500 mt-1">لكتابة النصوص والأرقام</p>
+          </div>
+
+          <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-4 text-center card-hover">
+            <div class="text-4xl mb-2">🖱️</div>
+            <p class="font-bold text-green-700 text-sm">الماوس</p>
+            <p class="text-xs text-gray-500 mt-1">للتحكم والنقر والسحب</p>
+          </div>
+
+          <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-4 text-center card-hover">
+            <div class="text-4xl mb-2">🎤</div>
+            <p class="font-bold text-green-700 text-sm">الميكروفون</p>
+            <p class="text-xs text-gray-500 mt-1">لإدخال الصوت</p>
+          </div>
+
+          <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-4 text-center card-hover">
+            <div class="text-4xl mb-2">📷</div>
+            <p class="font-bold text-green-700 text-sm">الكاميرا</p>
+            <p class="text-xs text-gray-500 mt-1">لإدخال الصور والفيديو</p>
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6">
+          <button onclick="goToPage(7)" class="text-gray-400 text-sm">⟩ السابق</button>
+          <button onclick="goToPage(9); addPoints(10);" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">
+            التالي ⟨
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 9 -->
+    <section id="page9" class="page flex-col items-center overflow-y-auto hide-scrollbar fade-in">
+      <div class="max-w-3xl mx-auto px-5 py-8 w-full">
+        <h2 class="text-2xl font-bold text-center mb-2 text-blue-600">🔵 أجهزة الإخراج</h2>
+        <p class="text-center text-xs text-gray-400 mb-5">تعرض النتائج من الحاسوب</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-center card-hover">
+            <div class="text-4xl mb-2">🖥️</div>
+            <p class="font-bold text-blue-700 text-sm">الشاشة</p>
+            <p class="text-xs text-gray-500 mt-1">لعرض الصور والنصوص</p>
+          </div>
+
+          <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-center card-hover">
+            <div class="text-4xl mb-2">🔊</div>
+            <p class="font-bold text-blue-700 text-sm">السماعات</p>
+            <p class="text-xs text-gray-500 mt-1">لإخراج الصوت</p>
+          </div>
+
+          <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-center card-hover">
+            <div class="text-4xl mb-2">🖨️</div>
+            <p class="font-bold text-blue-700 text-sm">الطابعة</p>
+            <p class="text-xs text-gray-500 mt-1">لطباعة الأوراق</p>
+          </div>
+
+          <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-center card-hover">
+            <div class="text-4xl mb-2">📽️</div>
+            <p class="font-bold text-blue-700 text-sm">جهاز العرض</p>
+            <p class="text-xs text-gray-500 mt-1">لعرض الصور على الحائط</p>
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6">
+          <button onclick="goToPage(8)" class="text-gray-400 text-sm">⟩ السابق</button>
+          <button onclick="goToPage(10); addPoints(10);" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">
+            التالي ⟨
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 10 -->
+    <section id="page10" class="page flex-col items-center overflow-y-auto hide-scrollbar fade-in">
+      <div class="max-w-4xl mx-auto px-5 py-8 w-full">
+        <h2 class="text-2xl font-bold text-center mb-5 text-gray-700">⚖️ مقارنة</h2>
+
+        <div class="grid md:grid-cols-2 gap-3">
+          <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-4">
+            <h3 class="font-bold text-green-600 text-center text-sm mb-3">أجهزة الإدخال 🟢</h3>
+            <div class="space-y-2 text-center">
+              <p class="bg-white rounded-lg py-2 text-sm shadow-sm">⌨️ لوحة المفاتيح</p>
+              <p class="bg-white rounded-lg py-2 text-sm shadow-sm">🖱️ الماوس</p>
+              <p class="bg-white rounded-lg py-2 text-sm shadow-sm">🎤 الميكروفون</p>
+              <p class="bg-white rounded-lg py-2 text-sm shadow-sm">📷 الكاميرا</p>
+            </div>
+            <p class="text-xs text-green-600 text-center mt-3 font-semibold">تنقل البيانات إلى الحاسوب</p>
+          </div>
+
+          <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4">
+            <h3 class="font-bold text-blue-600 text-center text-sm mb-3">أجهزة الإخراج 🔵</h3>
+            <div class="space-y-2 text-center">
+              <p class="bg-white rounded-lg py-2 text-sm shadow-sm">🖥️ الشاشة</p>
+              <p class="bg-white rounded-lg py-2 text-sm shadow-sm">🔊 السماعات</p>
+              <p class="bg-white rounded-lg py-2 text-sm shadow-sm">🖨️ الطابعة</p>
+              <p class="bg-white rounded-lg py-2 text-sm shadow-sm">📽️ جهاز العرض</p>
+            </div>
+            <p class="text-xs text-blue-600 text-center mt-3 font-semibold">تعرض النتائج للمستخدم</p>
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6">
+          <button onclick="goToPage(9)" class="text-gray-400 text-sm">⟩ السابق</button>
+          <button onclick="goToPage(11); addPoints(10);" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">
+            التالي ⟨
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 11 -->
+    <section id="page11" class="page flex-col items-center overflow-y-auto hide-scrollbar fade-in">
+      <div class="max-w-3xl mx-auto px-5 py-8 w-full">
+        <h2 class="text-2xl font-bold text-center mb-2 text-gray-700">❓ اختبر معلوماتك</h2>
+        <p class="text-center text-xs text-gray-400 mb-5">اختر الإجابة الصحيحة واحصل على نقاط 🌟</p>
+
+        <div id="q1" class="bg-white rounded-2xl p-5 shadow-sm mb-4">
+          <p class="font-bold text-sm mb-3">١. أي من هذه أجهزة إدخال؟</p>
+          <div class="space-y-2" id="q1options">
+            <button onclick="checkAnswer(this,'q1','wrong')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">🖥️ الشاشة</button>
+            <button onclick="checkAnswer(this,'q1','correct')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">⌨️ لوحة المفاتيح</button>
+            <button onclick="checkAnswer(this,'q1','wrong')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">🔊 السماعات</button>
+          </div>
+          <p id="q1feedback" class="text-sm mt-2 font-bold text-center hidden"></p>
+        </div>
+
+        <div id="q2" class="bg-white rounded-2xl p-5 shadow-sm mb-4">
+          <p class="font-bold text-sm mb-3">٢. الطابعة هي جهاز...</p>
+          <div class="space-y-2" id="q2options">
+            <button onclick="checkAnswer(this,'q2','wrong')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">إدخال</button>
+            <button onclick="checkAnswer(this,'q2','correct')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">إخراج</button>
+            <button onclick="checkAnswer(this,'q2','wrong')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">معالجة</button>
+          </div>
+          <p id="q2feedback" class="text-sm mt-2 font-bold text-center hidden"></p>
+        </div>
+
+        <div id="q3" class="bg-white rounded-2xl p-5 shadow-sm mb-4">
+          <p class="font-bold text-sm mb-3">٣. الميكروفون يُستخدم لـ...</p>
+          <div class="space-y-2" id="q3options">
+            <button onclick="checkAnswer(this,'q3','correct')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">إدخال الصوت</button>
+            <button onclick="checkAnswer(this,'q3','wrong')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">إخراج الصوت</button>
+            <button onclick="checkAnswer(this,'q3','wrong')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">طباعة الصور</button>
+          </div>
+          <p id="q3feedback" class="text-sm mt-2 font-bold text-center hidden"></p>
+        </div>
+
+        <div class="flex justify-between mt-4">
+          <button onclick="goToPage(10)" class="text-gray-400 text-sm">⟩ السابق</button>
+          <button onclick="goToPage(12)" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">
+            التالي ⟨
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 12 -->
+    <section id="page12" class="page flex-col items-center overflow-y-auto hide-scrollbar fade-in">
+      <div class="max-w-3xl mx-auto px-5 py-8 w-full">
+        <h2 class="text-2xl font-bold text-center mb-2 text-gray-700">🎯 صنّف الأجهزة</h2>
+        <p class="text-center text-xs text-gray-400 mb-4">اسحب كل جهاز إلى المجموعة الصحيحة لتحصل على نقاط</p>
+
+        <div id="dragItems" class="flex flex-wrap gap-2 justify-center mb-5">
+          <div class="drag-item bg-white rounded-xl px-4 py-2 shadow-sm border-2 border-gray-200 text-sm" draggable="true" data-type="input">⌨️ لوحة المفاتيح</div>
+          <div class="drag-item bg-white rounded-xl px-4 py-2 shadow-sm border-2 border-gray-200 text-sm" draggable="true" data-type="output">🖥️ الشاشة</div>
+          <div class="drag-item bg-white rounded-xl px-4 py-2 shadow-sm border-2 border-gray-200 text-sm" draggable="true" data-type="input">🖱️ الماوس</div>
+          <div class="drag-item bg-white rounded-xl px-4 py-2 shadow-sm border-2 border-gray-200 text-sm" draggable="true" data-type="output">🔊 السماعات</div>
+          <div class="drag-item bg-white rounded-xl px-4 py-2 shadow-sm border-2 border-gray-200 text-sm" draggable="true" data-type="input">🎤 الميكروفون</div>
+          <div class="drag-item bg-white rounded-xl px-4 py-2 shadow-sm border-2 border-gray-200 text-sm" draggable="true" data-type="output">🖨️ الطابعة</div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div id="inputZone" class="drop-zone bg-green-50 border-2 border-dashed border-green-300 rounded-2xl p-4 min-h-[140px]" data-accept="input">
+            <h3 class="font-bold text-green-600 text-center text-sm mb-2">🟢 إدخال</h3>
+            <div id="inputZoneItems" class="space-y-1"></div>
+          </div>
+
+          <div id="outputZone" class="drop-zone bg-blue-50 border-2 border-dashed border-blue-300 rounded-2xl p-4 min-h-[140px]" data-accept="output">
+            <h3 class="font-bold text-blue-600 text-center text-sm mb-2">🔵 إخراج</h3>
+            <div id="outputZoneItems" class="space-y-1"></div>
+          </div>
+        </div>
+
+        <p id="dragFeedback" class="text-center text-sm font-bold mt-3 hidden"></p>
+
+        <div class="flex justify-between mt-6">
+          <button onclick="goToPage(11)" class="text-gray-400 text-sm">⟩ السابق</button>
+          <button onclick="goToPage(13)" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">
+            التالي ⟨
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 13 -->
+    <section id="page13" class="page flex-col items-center overflow-y-auto hide-scrollbar fade-in">
+      <div class="max-w-3xl mx-auto px-5 py-8 w-full text-center">
+        <h2 class="text-2xl font-bold mb-2 text-gray-700">🎮 لعبة السرعة</h2>
+        <p class="text-xs text-gray-400 mb-4">صنّف الجهاز بسرعة: إدخال أم إخراج؟</p>
+
+        <div class="bg-white rounded-3xl p-6 shadow-sm mb-4">
+          <div id="gameDevice" class="text-6xl mb-3">⌨️</div>
+          <p id="gameDeviceName" class="font-bold text-lg text-gray-700 mb-4">لوحة المفاتيح</p>
+
+          <div class="flex gap-3 justify-center flex-wrap">
+            <button onclick="gameAnswer('input')" class="bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-xl text-sm transition active:scale-95">
+              🟢 إدخال
+            </button>
+            <button onclick="gameAnswer('output')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold px-6 py-3 rounded-xl text-sm transition active:scale-95">
+              🔵 إخراج
+            </button>
+          </div>
+
+          <p id="gameFeedback" class="text-sm font-bold mt-3 min-h-[24px]"></p>
+        </div>
+
+        <div class="flex justify-center gap-4 text-sm flex-wrap">
+          <span id="gameScore" class="bg-yellow-100 text-yellow-700 font-bold px-4 py-1 rounded-full">النقاط: 0</span>
+          <span id="gameRound" class="bg-gray-100 text-gray-600 font-bold px-4 py-1 rounded-full">الجولة: 1/8</span>
+        </div>
+
+        <div class="flex justify-between mt-6">
+          <button onclick="goToPage(12)" class="text-gray-400 text-sm">⟩ السابق</button>
+          <button onclick="goToPage(14)" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">
+            التالي ⟨
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 14 -->
+    <section id="page14" class="page flex-col items-center overflow-y-auto hide-scrollbar fade-in">
+      <div class="max-w-3xl mx-auto px-5 py-8 w-full text-center">
+        <h2 class="text-2xl font-bold mb-4 text-gray-700">📱 الواقع المعزز</h2>
+
+        <div class="bg-white rounded-3xl p-6 shadow-sm mb-4">
+          <p class="text-sm text-gray-500 mb-4">امسح رمز QR لرؤية نموذج ثلاثي الأبعاد للحاسوب</p>
+
+          <div class="bg-gray-100 w-40 h-40 mx-auto rounded-2xl flex items-center justify-center mb-4 text-6xl">
+            🔳
+          </div>
+
+          <div class="float text-6xl mb-3">🖥️</div>
+          <p class="text-xs text-gray-400 mt-3">يمكنك لاحقًا استبدال رمز QR بصورة حقيقية</p>
+        </div>
+
+        <div class="flex justify-between mt-6">
+          <button onclick="goToPage(13)" class="text-gray-400 text-sm">⟩ السابق</button>
+          <button onclick="goToPage(15)" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">
+            التالي ⟨
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 15 -->
+    <section id="page15" class="page flex-col items-center overflow-y-auto hide-scrollbar fade-in">
+      <div class="max-w-3xl mx-auto px-5 py-8 w-full text-center">
+        <h2 class="text-2xl font-bold mb-4 text-gray-700">🤖 الذكاء الاصطناعي في التعليم</h2>
+
+        <div class="bg-white rounded-3xl p-6 shadow-sm mb-4">
+          <div class="text-4xl mb-3">🧠</div>
+          <p class="text-sm text-gray-600 leading-relaxed mb-4">
+            تم استخدام الذكاء الاصطناعي في تصميم هذا الدرس لجعل التعلم أكثر متعة وتفاعلية.
+          </p>
+
+          <div class="space-y-3">
+            <div class="bg-purple-50 rounded-xl p-3 flex items-center gap-3">
+              <span class="text-2xl">🎨</span>
+              <span class="text-sm text-right">المساعدة في تصميم المحتوى التعليمي</span>
+            </div>
+
+            <div class="bg-purple-50 rounded-xl p-3 flex items-center gap-3">
+              <span class="text-2xl">🎮</span>
+              <span class="text-sm text-right">إنشاء أنشطة وألعاب تعليمية تفاعلية</span>
+            </div>
+
+            <div class="bg-purple-50 rounded-xl p-3 flex items-center gap-3">
+              <span class="text-2xl">📊</span>
+              <span class="text-sm text-right">دعم التقييم والتغذية الراجعة</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-6">
+          <button onclick="goToPage(14)" class="text-gray-400 text-sm">⟩ السابق</button>
+          <button onclick="goToPage(16); addPoints(10);" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">
+            النهاية ⟨
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 16 -->
+    <section id="page16" class="page flex-col items-center justify-center fade-in" style="background: linear-gradient(135deg, #fefce8 0%, #f0fdf4 50%, #dbeafe 100%);">
+      <div class="max-w-2xl mx-auto px-5 py-8 w-full text-center">
+        <div class="mb-4 text-7xl">🏆</div>
+        <h2 id="congratsMsg" class="text-3xl font-black text-gray-800 mb-2">مبروك! أنت خبير الحاسوب 🎉</h2>
+        <p class="text-sm text-gray-500 mb-4">أكملت رحلة استكشاف مكونات الحاسوب</p>
+
+        <div class="bg-white/90 backdrop-blur rounded-2xl p-5 shadow-sm mb-6 inline-block">
+          <p class="text-sm text-gray-500 mb-1">مجموع النقاط</p>
+          <p id="finalScore" class="text-4xl font-black text-actionYellow">0</p>
+          <div class="mt-3">
+            <span class="bg-yellow-100 text-yellow-700 font-bold px-4 py-1 rounded-full text-sm">🏅 شارة: خبير الحاسوب</span>
+          </div>
+        </div>
+
+        <br>
+
+        <button onclick="resetAll()" class="bg-actionYellow hover:bg-yellow-500 text-white font-bold px-8 py-3 rounded-full shadow-lg text-sm transition hover:scale-105 active:scale-95">
+          أعد الرحلة من البداية 🔄
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    let currentPage = 1;
+    const totalPages = 16;
+    let points = 0;
+    let level = 1;
+    const answeredQuestions = {};
+
+    const gameDevices = [
+      { emoji: "⌨️", name: "لوحة المفاتيح", type: "input" },
+      { emoji: "🖱️", name: "الماوس", type: "input" },
+      { emoji: "🎤", name: "الميكروفون", type: "input" },
+      { emoji: "📷", name: "الكاميرا", type: "input" },
+      { emoji: "🖥️", name: "الشاشة", type: "output" },
+      { emoji: "🔊", name: "السماعات", type: "output" },
+      { emoji: "🖨️", name: "الطابعة", type: "output" },
+      { emoji: "📽️", name: "جهاز العرض", type: "output" },
+    ];
+
+    let gameIndex = 0;
+    let gameScoreValue = 0;
+    let gameOrder = [];
+    let draggedItem = null;
+    let dragCorrectCount = 0;
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function goToPage(n) {
+      const current = document.getElementById("page" + currentPage);
+      const next = document.getElementById("page" + n);
+
+      if (!current || !next) return;
+
+      current.classList.remove("active");
+      currentPage = n;
+      next.classList.add("active");
+      next.classList.remove("fade-in");
+      void next.offsetWidth;
+      next.classList.add("fade-in");
+
+      updateProgress();
+
+      if (n === 13) {
+        initGame();
       }
     }
-  }
-}
-</script>
-  <style>body { box-sizing: border-box; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
- </head>
- <body class="h-full bg-gray-50 text-gray-800 overflow-hidden">
-  <div id="app" class="h-full w-full flex flex-col overflow-hidden">
-   <!-- Top Bar -->
-   <header id="topBar" class="w-full bg-gradient-to-r from-blue-50 to-green-50 shadow-md px-4 py-3 flex items-center justify-between z-20 border-b-2 border-yellow-200" style="display:none;">
-    <div class="flex items-center gap-3">
-     <span id="pointsDisplay" class="bg-yellow-200 text-yellow-800 font-bold px-4 py-2 rounded-full text-sm shadow-md">⭐ 0 نقطة</span> <span id="levelDisplay" class="bg-blue-200 text-blue-800 font-bold px-4 py-2 rounded-full text-sm shadow-md">🎖️ المستوى 1</span>
-    </div>
-    <div class="flex-1 mx-4 max-w-xs">
-     <div class="h-3 bg-gray-300 rounded-full overflow-hidden shadow-md">
-      <div id="progressBar" class="h-full bg-gradient-to-r from-green-400 via-yellow-400 to-orange-400 rounded-full progress-fill" style="width:0%"></div>
-     </div>
-    </div><span id="pageIndicator" class="text-xs text-gray-600 font-bold bg-white px-3 py-1 rounded-full shadow-sm"></span>
-   </header><!-- Points Toast -->
-   <div id="pointsToast" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-yellow-400 to-orange-400 text-white font-black px-6 py-3 rounded-full shadow-2xl text-lg border-2 border-yellow-300" style="display:none; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
-    +10 ⭐
-   </div><!-- PAGE 1: Cover -->
-   <div id="page1" class="page active flex-col items-center justify-center h-full w-full fade-in" style="background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 50%, #fefce8 100%);">
-    <div class="text-center px-6 max-w-lg mx-auto">
-     <div class="float mb-6">
-      <svg width="160" height="140" viewbox="0 0 160 140" class="mx-auto drop-shadow-lg"><!-- Monitor Stand --> <rect x="50" y="105" width="60" height="6" rx="3" fill="#6b7280" /> <!-- Monitor Base --> <ellipse cx="80" cy="115" rx="40" ry="8" fill="#9ca3af" opacity="0.6" /> <!-- Monitor Screen --> <defs>
-        <lineargradient id="screenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-         <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:1" />
-         <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
-        </lineargradient>
-        <filter id="glow">
-         <fegaussianblur stddeviation="2" result="coloredBlur" />
-         <femerge>
-          <femergenode in="coloredBlur" />
-          <femergenode in="SourceGraphic" />
-         </femerge>
-        </filter>
-       </defs> <rect x="20" y="10" width="120" height="85" rx="12" fill="url(#screenGrad)" stroke="#1e40af" stroke-width="3" filter="url(#glow)" /> <rect x="28" y="18" width="104" height="69" rx="8" fill="#ecf0f1" /> <!-- Screen Content --> <rect x="35" y="25" width="90" height="12" rx="2" fill="#3b82f6" opacity="0.8" /> <rect x="35" y="42" width="85" height="6" rx="1" fill="#6b7280" opacity="0.6" /> <rect x="35" y="52" width="85" height="6" rx="1" fill="#6b7280" opacity="0.6" /> <rect x="35" y="62" width="60" height="6" rx="1" fill="#6b7280" opacity="0.6" /> <!-- Keyboard --> <rect x="15" y="105" width="130" height="15" rx="3" fill="#374151" /> <circle cx="30" cy="112" r="1.5" fill="#9ca3af" /> <circle cx="45" cy="112" r="1.5" fill="#9ca3af" /> <circle cx="60" cy="112" r="1.5" fill="#9ca3af" /> <circle cx="75" cy="112" r="1.5" fill="#9ca3af" /> <circle cx="90" cy="112" r="1.5" fill="#9ca3af" /> <circle cx="105" cy="112" r="1.5" fill="#9ca3af" /> <circle cx="120" cy="112" r="1.5" fill="#9ca3af" /> <circle cx="135" cy="112" r="1.5" fill="#9ca3af" /> <!-- Mouse --> <ellipse cx="135" cy="85" rx="12" ry="16" fill="#4b5563" stroke="#2d3748" stroke-width="1" /> <circle cx="135" cy="82" r="4" fill="#7c8799" />
-      </svg>
-     </div>
-     <h1 id="coverTitle" class="text-2xl md:text-3xl font-black text-gray-800 leading-relaxed mb-3">رحلة استكشاف مكونات الحاسوب</h1>
-     <p class="text-base text-gray-500 mb-2">(أجهزة الإدخال والإخراج)</p>
-     <p class="text-sm text-gray-400 mb-8">الصف الخامس – تقنية المعلومات</p><button id="startBtn" onclick="goToPage(2); showTopBar();" class="bg-actionYellow hover:bg-yellow-500 text-white font-bold px-8 py-3 rounded-full shadow-lg text-lg transition-all hover:scale-105 active:scale-95"> ابدأ الرحلة 🚀 </button>
-    </div>
-   </div><!-- PAGE 2: User Guide -->
-   <div id="page2" class="page flex-col items-center h-full w-full overflow-y-auto fade-in">
-    <div class="max-w-lg mx-auto px-5 py-8 w-full">
-     <h2 class="text-xl font-bold text-center mb-6 text-gray-700">📖 دليل الاستخدام</h2>
-     <div class="space-y-4">
-      <div class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm"><span class="text-3xl">👆</span><span class="text-sm">اضغط على الأزرار للتنقل بين الصفحات</span>
-      </div>
-      <div class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm"><span class="text-3xl">⭐</span><span class="text-sm">اجمع النقاط من الأنشطة والإجابات الصحيحة</span>
-      </div>
-      <div class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm"><span class="text-3xl">🏆</span><span class="text-sm">أكمل الرحلة واحصل على شارة "خبير الحاسوب"</span>
-      </div>
-      <div class="flex items-center gap-4 bg-white rounded-2xl p-4 shadow-sm"><span class="text-3xl">🎮</span><span class="text-sm">استمتع بالألعاب والأنشطة التفاعلية</span>
-      </div>
-     </div>
-     <div class="flex justify-between mt-8">
-      <button onclick="goToPage(1); hideTopBar();" class="text-gray-400 text-sm">⟩ السابق</button> <button onclick="goToPage(3); addPoints(5);" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">التالي ⟨</button>
-     </div>
-    </div>
-   </div><!-- PAGE 3: Introduction -->
-   <div id="page3" class="page flex-col items-center h-full w-full overflow-y-auto fade-in">
-    <div class="max-w-lg mx-auto px-5 py-8 w-full text-center">
-     <div class="bg-white rounded-3xl p-6 shadow-lg mb-6 bounce-in">
-      <div class="text-5xl mb-4 animate-bounce">
-       🤔
-      </div>
-      <h2 class="text-xl font-bold text-gray-700 mb-3">هل تعرف كيف يعمل الحاسوب؟</h2>
-      <p class="text-sm text-gray-500 leading-relaxed">كيف نُدخل المعلومات إليه؟ وكيف يُظهر لنا النتائج؟</p>
-      <div class="mt-4 flex justify-center">
-       <svg width="180" height="80" viewbox="0 0 180 80">
-        <rect x="10" y="10" width="45" height="35" rx="5" fill="#dcfce7" stroke="#22c55e" stroke-width="2" /> <text x="32" y="32" text-anchor="middle" font-size="18">
-         ⌨️
-        </text> <path d="M60 28 L85 40" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow)" /> <rect x="68" y="20" width="45" height="40" rx="6" fill="#e0e7ff" stroke="#3b82f6" stroke-width="2" /> <text x="90" y="45" text-anchor="middle" font-size="18">
-         💻
-        </text> <path d="M118 40 L143 28" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrow)" /> <rect x="125" y="10" width="45" height="35" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="2" /> <text x="147" y="32" text-anchor="middle" font-size="18">
-         🖥️
-        </text> <defs>
-         <marker id="arrow" markerwidth="8" markerheight="6" refx="8" refy="3" orient="auto">
-          <path d="M0,0 L8,3 L0,6" fill="#f59e0b" />
-         </marker>
-        </defs>
-       </svg>
-      </div>
-     </div>
-     <p class="text-sm text-gray-400">هيا نكتشف معاً! 🌟</p>
-     <div class="flex justify-between mt-6">
-      <button onclick="goToPage(2)" class="text-gray-400 text-sm">⟩ السابق</button> <button onclick="goToPage(4)" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">التالي ⟨</button>
-     </div>
-    </div>
-   </div><!-- PAGE 4: Table of Contents -->
-   <div id="page4" class="page flex-col items-center h-full w-full overflow-y-auto fade-in">
-    <div class="max-w-lg mx-auto px-5 py-8 w-full">
-     <h2 class="text-xl font-bold text-center mb-6 text-gray-700">📋 محتويات الرحلة</h2>
-     <div class="space-y-2">
-      <button onclick="goToPage(6)" class="w-full text-right bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition flex items-center gap-3 text-sm"><span class="bg-blue-100 text-blue-600 w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs">1</span>أهداف التعلم</button> <button onclick="goToPage(7)" class="w-full text-right bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition flex items-center gap-3 text-sm"><span class="bg-blue-100 text-blue-600 w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs">2</span>ما هو الحاسوب؟</button> <button onclick="goToPage(8)" class="w-full text-right bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition flex items-center gap-3 text-sm"><span class="bg-green-100 text-green-600 w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs">3</span>أجهزة الإدخال</button> <button onclick="goToPage(9)" class="w-full text-right bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition flex items-center gap-3 text-sm"><span class="bg-blue-100 text-blue-600 w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs">4</span>أجهزة الإخراج</button> <button onclick="goToPage(10)" class="w-full text-right bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition flex items-center gap-3 text-sm"><span class="bg-purple-100 text-purple-600 w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs">5</span>مقارنة: إدخال و إخراج</button> <button onclick="goToPage(11)" class="w-full text-right bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition flex items-center gap-3 text-sm"><span class="bg-yellow-100 text-yellow-600 w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs">6</span>نشاط تفاعلي</button> <button onclick="goToPage(13)" class="w-full text-right bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition flex items-center gap-3 text-sm"><span class="bg-yellow-100 text-yellow-600 w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs">7</span>لعبة التصنيف</button>
-     </div>
-     <div class="flex justify-between mt-6">
-      <button onclick="goToPage(3)" class="text-gray-400 text-sm">⟩ السابق</button> <button onclick="goToPage(5)" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">التالي ⟨</button>
-     </div>
-    </div>
-   </div><!-- PAGE 5: AI Video Placeholder -->
-   <div id="page5" class="page flex-col items-center h-full w-full overflow-y-auto fade-in">
-    <div class="max-w-lg mx-auto px-5 py-8 w-full text-center">
-     <h2 class="text-xl font-bold mb-6 text-gray-700">🎬 فيديو تعليمي</h2>
-     <div class="bg-gray-900 rounded-2xl aspect-video flex flex-col items-center justify-center shadow-lg mb-4 relative overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-to-br from-blue-900/50 to-purple-900/50"></div>
-      <div class="relative z-10">
-       <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-3 mx-auto backdrop-blur">
-        <div class="w-0 h-0 border-t-[12px] border-t-transparent border-b-[12px] border-b-transparent border-r-[20px] border-r-white mr-1" style="transform:rotate(180deg)"></div>
-       </div>
-<iframe width="560" height="315" 
-src="https://www.youtube.com/embed/45LtBSwxfcU" 
-title="YouTube video player" 
-frameborder="0" 
-allowfullscreen>
-</iframe>      </div>
-     </div>
-     <p class="text-xs text-gray-400">تم إنشاء هذا المحتوى بمساعدة الذكاء الاصطناعي</p>
-     <div class="flex justify-between mt-6">
-      <button onclick="goToPage(4)" class="text-gray-400 text-sm">⟩ السابق</button> <button onclick="goToPage(6)" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">التالي ⟨</button>
-     </div>
-    </div>
-   </div><!-- PAGE 6: Learning Objectives -->
-   <div id="page6" class="page flex-col items-center h-full w-full overflow-y-auto fade-in">
-    <div class="max-w-lg mx-auto px-5 py-8 w-full">
-     <h2 class="text-xl font-bold text-center mb-6 text-gray-700">🎯 أهداف التعلم</h2>
-     <div class="space-y-4">
-      <div class="bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300 rounded-2xl p-5 card-hover shadow-md">
-       <div class="flex items-start gap-4"><span class="text-3xl bg-green-200 w-14 h-14 rounded-full flex items-center justify-center">1️⃣</span>
-        <div>
-         <p class="font-bold text-green-700 text-sm mb-1">🎯 التعرف على أجهزة الإدخال</p>
-         <p class="text-xs text-gray-600">لوحة المفاتيح، الماوس، الميكروفون، الكاميرا وفهم وظائفها</p>
-        </div>
-       </div>
-      </div>
-      <div class="bg-gradient-to-r from-blue-100 to-cyan-100 border-2 border-blue-300 rounded-2xl p-5 card-hover shadow-md">
-       <div class="flex items-start gap-4"><span class="text-3xl bg-blue-200 w-14 h-14 rounded-full flex items-center justify-center">2️⃣</span>
-        <div>
-         <p class="font-bold text-blue-700 text-sm mb-1">🎯 التعرف على أجهزة الإخراج</p>
-         <p class="text-xs text-gray-600">الشاشة، السماعات، الطابعة، جهاز العرض وكيفية عملها</p>
-        </div>
-       </div>
-      </div>
-      <div class="bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-2xl p-5 card-hover shadow-md">
-       <div class="flex items-start gap-4"><span class="text-3xl bg-yellow-200 w-14 h-14 rounded-full flex items-center justify-center">3️⃣</span>
-        <div>
-         <p class="font-bold text-yellow-700 text-sm mb-1">🎯 التمييز بين الإدخال والإخراج</p>
-         <p class="text-xs text-gray-600">فهم الفرق العملي بينهما ودورها في معالجة البيانات</p>
-        </div>
-       </div>
-      </div>
-     </div>
-     <div class="flex justify-between mt-6">
-      <button onclick="goToPage(5)" class="text-gray-400 text-sm">⟩ السابق</button> <button onclick="goToPage(7); addPoints(5);" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">التالي ⟨</button>
-     </div>
-    </div>
-   </div><!-- PAGE 7: What is a Computer -->
-   <div id="page7" class="page flex-col items-center h-full w-full overflow-y-auto fade-in">
-    <div class="max-w-lg mx-auto px-5 py-8 w-full text-center">
-     <h2 class="text-xl font-bold mb-6 text-gray-700">💻 ما هو الحاسوب؟</h2>
-     <div class="bg-white rounded-3xl p-6 shadow-sm mb-4">
-      <svg width="220" height="100" viewbox="0 0 220 100" class="mx-auto mb-4">
-       <!-- Input --> <rect x="5" y="25" width="55" height="50" rx="10" fill="#dcfce7" stroke="#22c55e" stroke-width="2" /> <text x="32" y="48" text-anchor="middle" font-size="10" fill="#166534" font-weight="bold">
-        إدخال
-       </text> <text x="32" y="65" text-anchor="middle" font-size="16">
-        ⌨️🖱️
-       </text> <!-- Arrow --> <path d="M65 50 L85 50" stroke="#f59e0b" stroke-width="3" marker-end="url(#arr2)" /> <!-- Process --> <rect x="85" y="20" width="55" height="60" rx="12" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" /> <text x="112" y="45" text-anchor="middle" font-size="10" fill="#92400e" font-weight="bold">
-        معالجة
-       </text> <text x="112" y="65" text-anchor="middle" font-size="20">
-        ⚙️
-       </text> <!-- Arrow --> <path d="M145 50 L165 50" stroke="#f59e0b" stroke-width="3" marker-end="url(#arr2)" /> <!-- Output --> <rect x="165" y="25" width="50" height="50" rx="10" fill="#dbeafe" stroke="#3b82f6" stroke-width="2" /> <text x="190" y="48" text-anchor="middle" font-size="10" fill="#1e40af" font-weight="bold">
-        إخراج
-       </text> <text x="190" y="65" text-anchor="middle" font-size="16">
-        🖥️🔊
-       </text> <defs>
-        <marker id="arr2" markerwidth="8" markerheight="6" refx="8" refy="3" orient="auto">
-         <path d="M0,0 L8,3 L0,6" fill="#f59e0b" />
-        </marker>
-       </defs>
-      </svg>
-      <p class="text-sm text-gray-600 leading-relaxed">الحاسوب جهاز إلكتروني يستقبل البيانات <strong class="text-green-600">(إدخال)</strong>، يعالجها <strong class="text-yellow-600">(معالجة)</strong>، ثم يُظهر النتائج <strong class="text-blue-600">(إخراج)</strong></p>
-     </div>
-     <div class="flex justify-between mt-6">
-      <button onclick="goToPage(6)" class="text-gray-400 text-sm">⟩ السابق</button> <button onclick="goToPage(8); addPoints(10);" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">التالي ⟨</button>
-     </div>
-    </div>
-   </div><!-- PAGE 8: Input Devices -->
-   <div id="page8" class="page flex-col items-center h-full w-full overflow-y-auto fade-in">
-    <div class="max-w-lg mx-auto px-5 py-8 w-full">
-     <h2 class="text-xl font-bold text-center mb-2 text-green-600">🟢 أجهزة الإدخال</h2>
-     <p class="text-center text-xs text-gray-400 mb-5">تنقل البيانات إلى الحاسوب</p>
-     <div class="grid grid-cols-2 gap-3">
-      <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-4 text-center card-hover">
-       <div class="text-4xl mb-2">
-        ⌨️
-       </div>
-       <p class="font-bold text-green-700 text-sm">لوحة المفاتيح</p>
-       <p class="text-xs text-gray-500 mt-1">لكتابة النصوص والأرقام</p>
-      </div>
-      <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-4 text-center card-hover">
-       <div class="text-4xl mb-2">
-        🖱️
-       </div>
-       <p class="font-bold text-green-700 text-sm">الماوس</p>
-       <p class="text-xs text-gray-500 mt-1">للتحكم والنقر والسحب</p>
-      </div>
-      <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-4 text-center card-hover">
-       <div class="text-4xl mb-2">
-        🎤
-       </div>
-       <p class="font-bold text-green-700 text-sm">الميكروفون</p>
-       <p class="text-xs text-gray-500 mt-1">لإدخال الصوت</p>
-      </div>
-      <div class="bg-green-50 border-2 border-green-200 rounded-2xl p-4 text-center card-hover">
-       <div class="text-4xl mb-2">
-        📷
-       </div>
-       <p class="font-bold text-green-700 text-sm">الكاميرا</p>
-       <p class="text-xs text-gray-500 mt-1">لإدخال الصور والفيديو</p>
-      </div>
-     </div>
-     <div class="flex justify-between mt-6">
-      <button onclick="goToPage(7)" class="text-gray-400 text-sm">⟩ السابق</button> <button onclick="goToPage(9); addPoints(10);" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">التالي ⟨</button>
-     </div>
-    </div>
-   </div><!-- PAGE 9: Output Devices -->
-   <div id="page9" class="page flex-col items-center h-full w-full overflow-y-auto fade-in">
-    <div class="max-w-lg mx-auto px-5 py-8 w-full">
-     <h2 class="text-xl font-bold text-center mb-2 text-blue-600">🔵 أجهزة الإخراج</h2>
-     <p class="text-center text-xs text-gray-400 mb-5">تعرض النتائج من الحاسوب</p>
-     <div class="grid grid-cols-2 gap-3">
-      <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-center card-hover">
-       <div class="text-4xl mb-2">
-        🖥️
-       </div>
-       <p class="font-bold text-blue-700 text-sm">الشاشة</p>
-       <p class="text-xs text-gray-500 mt-1">لعرض الصور والنصوص</p>
-      </div>
-      <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-center card-hover">
-       <div class="text-4xl mb-2">
-        🔊
-       </div>
-       <p class="font-bold text-blue-700 text-sm">السماعات</p>
-       <p class="text-xs text-gray-500 mt-1">لإخراج الصوت</p>
-      </div>
-      <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-center card-hover">
-       <div class="text-4xl mb-2">
-        🖨️
-       </div>
-       <p class="font-bold text-blue-700 text-sm">الطابعة</p>
-       <p class="text-xs text-gray-500 mt-1">لطباعة الأوراق</p>
-      </div>
-      <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 text-center card-hover">
-       <div class="text-4xl mb-2">
-        📽️
-       </div>
-       <p class="font-bold text-blue-700 text-sm">جهاز العرض</p>
-       <p class="text-xs text-gray-500 mt-1">لعرض الصور على الحائط</p>
-      </div>
-     </div>
-     <div class="flex justify-between mt-6">
-      <button onclick="goToPage(8)" class="text-gray-400 text-sm">⟩ السابق</button> <button onclick="goToPage(10); addPoints(10);" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">التالي ⟨</button>
-     </div>
-    </div>
-   </div><!-- PAGE 10: Comparison -->
-   <div id="page10" class="page flex-col items-center h-full w-full overflow-y-auto fade-in">
-    <div class="max-w-lg mx-auto px-5 py-8 w-full">
-     <h2 class="text-xl font-bold text-center mb-5 text-gray-700">⚖️ مقارنة</h2>
-     <div class="flex gap-3">
-      <div class="flex-1 bg-green-50 border-2 border-green-200 rounded-2xl p-4">
-       <h3 class="font-bold text-green-600 text-center text-sm mb-3">أجهزة الإدخال 🟢</h3>
-       <div class="space-y-2 text-center">
-        <p class="bg-white rounded-lg py-2 text-sm shadow-sm">⌨️ لوحة المفاتيح</p>
-        <p class="bg-white rounded-lg py-2 text-sm shadow-sm">🖱️ الماوس</p>
-        <p class="bg-white rounded-lg py-2 text-sm shadow-sm">🎤 الميكروفون</p>
-        <p class="bg-white rounded-lg py-2 text-sm shadow-sm">📷 الكاميرا</p>
-       </div>
-       <p class="text-xs text-green-600 text-center mt-3 font-semibold">تنقل البيانات ← للحاسوب</p>
-      </div>
-      <div class="flex-1 bg-blue-50 border-2 border-blue-200 rounded-2xl p-4">
-       <h3 class="font-bold text-blue-600 text-center text-sm mb-3">أجهزة الإخراج 🔵</h3>
-       <div class="space-y-2 text-center">
-        <p class="bg-white rounded-lg py-2 text-sm shadow-sm">🖥️ الشاشة</p>
-        <p class="bg-white rounded-lg py-2 text-sm shadow-sm">🔊 السماعات</p>
-        <p class="bg-white rounded-lg py-2 text-sm shadow-sm">🖨️ الطابعة</p>
-        <p class="bg-white rounded-lg py-2 text-sm shadow-sm">📽️ جهاز العرض</p>
-       </div>
-       <p class="text-xs text-blue-600 text-center mt-3 font-semibold">تعرض النتائج ← للمستخدم</p>
-      </div>
-     </div>
-     <div class="flex justify-between mt-6">
-      <button onclick="goToPage(9)" class="text-gray-400 text-sm">⟩ السابق</button> <button onclick="goToPage(11); addPoints(10);" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">التالي ⟨</button>
-     </div>
-    </div>
-   </div><!-- PAGE 11: Multiple Choice Quiz -->
-   <div id="page11" class="page flex-col items-center h-full w-full overflow-y-auto fade-in">
-    <div class="max-w-lg mx-auto px-5 py-8 w-full">
-     <h2 class="text-xl font-bold text-center mb-2 text-gray-700">❓ اختبر معلوماتك</h2>
-     <p class="text-center text-xs text-gray-400 mb-5">اختر الإجابة الصحيحة واحصل على نقاط! 🌟</p><!-- Q1 -->
-     <div id="q1" class="bg-white rounded-2xl p-5 shadow-sm mb-4">
-      <p class="font-bold text-sm mb-3">١. أي من هذه أجهزة إدخال؟</p>
-      <div class="space-y-2" id="q1options">
-       <button onclick="checkAnswer(this,'q1','wrong')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">🖥️ الشاشة</button> <button onclick="checkAnswer(this,'q1','correct')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">⌨️ لوحة المفاتيح</button> <button onclick="checkAnswer(this,'q1','wrong')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">🔊 السماعات</button>
-      </div>
-      <p id="q1feedback" class="text-sm mt-2 font-bold text-center" style="display:none;"></p>
-     </div><!-- Q2 -->
-     <div id="q2" class="bg-white rounded-2xl p-5 shadow-sm mb-4">
-      <p class="font-bold text-sm mb-3">٢. الطابعة هي جهاز...</p>
-      <div class="space-y-2" id="q2options">
-       <button onclick="checkAnswer(this,'q2','wrong')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">إدخال</button> <button onclick="checkAnswer(this,'q2','correct')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">إخراج</button> <button onclick="checkAnswer(this,'q2','wrong')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">معالجة</button>
-      </div>
-      <p id="q2feedback" class="text-sm mt-2 font-bold text-center" style="display:none;"></p>
-     </div><!-- Q3 -->
-     <div id="q3" class="bg-white rounded-2xl p-5 shadow-sm mb-4">
-      <p class="font-bold text-sm mb-3">٣. الميكروفون يُستخدم لـ...</p>
-      <div class="space-y-2" id="q3options">
-       <button onclick="checkAnswer(this,'q3','correct')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">إدخال الصوت</button> <button onclick="checkAnswer(this,'q3','wrong')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">إخراج الصوت</button> <button onclick="checkAnswer(this,'q3','wrong')" class="w-full text-right bg-gray-50 rounded-xl p-3 text-sm border-2 border-transparent hover:border-yellow-300 transition">طباعة الصور</button>
-      </div>
-      <p id="q3feedback" class="text-sm mt-2 font-bold text-center" style="display:none;"></p>
-     </div>
-     <div class="flex justify-between mt-4">
-      <button onclick="goToPage(10)" class="text-gray-400 text-sm">⟩ السابق</button> <button onclick="goToPage(12)" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">التالي ⟨</button>
-     </div>
-    </div>
-   </div><!-- PAGE 12: Drag & Drop -->
-   <div id="page12" class="page flex-col items-center h-full w-full overflow-y-auto fade-in">
-    <div class="max-w-lg mx-auto px-5 py-8 w-full">
-     <h2 class="text-xl font-bold text-center mb-2 text-gray-700">🎯 صنّف الأجهزة</h2>
-     <p class="text-center text-xs text-gray-400 mb-4">اسحب كل جهاز إلى المجموعة الصحيحة لتحصل على نقاط!</p>
-     <div id="dragItems" class="flex flex-wrap gap-2 justify-center mb-5">
-      <div class="drag-item bg-white rounded-xl px-4 py-2 shadow-sm border-2 border-gray-200 text-sm" draggable="true" data-type="input" data-name="keyboard">
-       ⌨️ لوحة المفاتيح
-      </div>
-      <div class="drag-item bg-white rounded-xl px-4 py-2 shadow-sm border-2 border-gray-200 text-sm" draggable="true" data-type="output" data-name="screen">
-       🖥️ الشاشة
-      </div>
-      <div class="drag-item bg-white rounded-xl px-4 py-2 shadow-sm border-2 border-gray-200 text-sm" draggable="true" data-type="input" data-name="mouse">
-       🖱️ الماوس
-      </div>
-      <div class="drag-item bg-white rounded-xl px-4 py-2 shadow-sm border-2 border-gray-200 text-sm" draggable="true" data-type="output" data-name="speaker">
-       🔊 السماعات
-      </div>
-      <div class="drag-item bg-white rounded-xl px-4 py-2 shadow-sm border-2 border-gray-200 text-sm" draggable="true" data-type="input" data-name="mic">
-       🎤 الميكروفون
-      </div>
-      <div class="drag-item bg-white rounded-xl px-4 py-2 shadow-sm border-2 border-gray-200 text-sm" draggable="true" data-type="output" data-name="printer">
-       🖨️ الطابعة
-      </div>
-     </div>
-     <div class="grid grid-cols-2 gap-3">
-      <div id="inputZone" class="drop-zone bg-green-50 border-2 border-dashed border-green-300 rounded-2xl p-4 min-h-[140px]" data-accept="input">
-       <h3 class="font-bold text-green-600 text-center text-sm mb-2">🟢 إدخال</h3>
-       <div id="inputZoneItems" class="space-y-1"></div>
-      </div>
-      <div id="outputZone" class="drop-zone bg-blue-50 border-2 border-dashed border-blue-300 rounded-2xl p-4 min-h-[140px]" data-accept="output">
-       <h3 class="font-bold text-blue-600 text-center text-sm mb-2">🔵 إخراج</h3>
-       <div id="outputZoneItems" class="space-y-1"></div>
-      </div>
-     </div>
-     <p id="dragFeedback" class="text-center text-sm font-bold mt-3" style="display:none;"></p>
-     <div class="flex justify-between mt-6">
-      <button onclick="goToPage(11)" class="text-gray-400 text-sm">⟩ السابق</button> <button onclick="goToPage(13)" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">التالي ⟨</button>
-     </div>
-    </div>
-   </div><!-- PAGE 13: Game -->
-   <div id="page13" class="page flex-col items-center h-full w-full overflow-y-auto fade-in">
-    <div class="max-w-lg mx-auto px-5 py-8 w-full text-center">
-     <h2 class="text-xl font-bold mb-2 text-gray-700">🎮 لعبة السرعة</h2>
-     <p class="text-xs text-gray-400 mb-4">صنّف الجهاز بسرعة! إدخال أو إخراج؟</p>
-     <div class="bg-white rounded-3xl p-6 shadow-sm mb-4">
-      <div id="gameDevice" class="text-5xl mb-3">
-       ⌨️
-      </div>
-      <p id="gameDeviceName" class="font-bold text-lg text-gray-700 mb-4">لوحة المفاتيح</p>
-      <div id="gameArea" class="flex gap-3 justify-center">
-       <button onclick="gameAnswer('input')" class="bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-xl text-sm transition active:scale-95">🟢 إدخال</button> <button onclick="gameAnswer('output')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold px-6 py-3 rounded-xl text-sm transition active:scale-95">🔵 إخراج</button>
-      </div>
-      <p id="gameFeedback" class="text-sm font-bold mt-3" style="min-height:24px;"></p>
-     </div>
-     <div class="flex justify-center gap-4 text-sm">
-      <span id="gameScore" class="bg-yellow-100 text-yellow-700 font-bold px-4 py-1 rounded-full">النقاط: 0</span> <span id="gameRound" class="bg-gray-100 text-gray-600 font-bold px-4 py-1 rounded-full">الجولة: 1/8</span>
-     </div>
-     <div class="flex justify-between mt-6">
-      <button onclick="goToPage(12)" class="text-gray-400 text-sm">⟩ السابق</button> <button onclick="goToPage(14)" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">التالي ⟨</button>
-     </div>
-    </div>
-   </div><!-- PAGE 14: AR Page -->
-   <div id="page14" class="page flex-col items-center h-full w-full overflow-y-auto fade-in">
-    <div class="max-w-lg mx-auto px-5 py-8 w-full text-center">
-     <h2 class="text-xl font-bold mb-4 text-gray-700">📱 الواقع المعزز</h2>
-     <div class="bg-white rounded-3xl p-6 shadow-sm mb-4">
-      <p class="text-sm text-gray-500 mb-4">امسح رمز QR لرؤية نموذج ثلاثي الأبعاد</p>
-      <div class="bg-gray-100 w-40 h-40 mx-auto rounded-2xl flex items-center justify-center mb-4">
-       <svg width="100" height="100" viewbox="0 0 100 100">
-        <rect x="10" y="10" width="25" height="25" rx="3" fill="#1f2937" /><rect x="13" y="13" width="8" height="8" fill="#fff" /><rect x="27" y="13" width="5" height="5" fill="#fff" /> <rect x="65" y="10" width="25" height="25" rx="3" fill="#1f2937" /><rect x="72" y="13" width="8" height="8" fill="#fff" /> <rect x="10" y="65" width="25" height="25" rx="3" fill="#1f2937" /><rect x="13" y="72" width="8" height="8" fill="#fff" /> <rect x="40" y="40" width="20" height="20" rx="3" fill="#1f2937" /> <rect x="65" y="65" width="10" height="10" fill="#1f2937" /><rect x="80" y="65" width="10" height="10" fill="#1f2937" /> <rect x="65" y="80" width="10" height="10" fill="#1f2937" />
-       </svg>
-      </div>
-      <div class="float">
-       <svg width="120" height="90" viewbox="0 0 120 90" class="mx-auto">
-        <rect x="10" y="5" width="100" height="65" rx="8" fill="#e0e7ff" stroke="#3b82f6" stroke-width="2" transform="skewY(-3)" /> <rect x="18" y="12" width="84" height="48" rx="4" fill="#bfdbfe" transform="skewY(-3)" /> <ellipse cx="60" cy="78" rx="30" ry="6" fill="#e5e7eb" />
-       </svg>
-      </div>
-      <p class="text-xs text-gray-400 mt-3">نموذج ثلاثي الأبعاد للحاسوب</p>
-     </div>
-     <div class="flex justify-between mt-6">
-      <button onclick="goToPage(13)" class="text-gray-400 text-sm">⟩ السابق</button> <button onclick="goToPage(15)" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">التالي ⟨</button>
-     </div>
-    </div>
-   </div><!-- PAGE 15: AI Usage -->
-   <div id="page15" class="page flex-col items-center h-full w-full overflow-y-auto fade-in">
-    <div class="max-w-lg mx-auto px-5 py-8 w-full text-center">
-     <h2 class="text-xl font-bold mb-4 text-gray-700">🤖 الذكاء الاصطناعي في التعليم</h2>
-     <div class="bg-white rounded-3xl p-6 shadow-sm mb-4">
-      <div class="text-4xl mb-3">
-       🧠
-      </div>
-      <p class="text-sm text-gray-600 leading-relaxed mb-4">تم استخدام الذكاء الاصطناعي في تصميم هذا الدرس لجعل التعلم أكثر متعة وتفاعلية</p>
-      <div class="space-y-3">
-       <div class="bg-purple-50 rounded-xl p-3 flex items-center gap-3">
-        <span class="text-2xl">🎨</span><span class="text-sm text-right">تصميم المحتوى التعليمي</span>
-       </div>
-       <div class="bg-purple-50 rounded-xl p-3 flex items-center gap-3">
-        <span class="text-2xl">🎮</span><span class="text-sm text-right">إنشاء الأنشطة التفاعلية</span>
-       </div>
-       <div class="bg-purple-50 rounded-xl p-3 flex items-center gap-3">
-        <span class="text-2xl">📊</span><span class="text-sm text-right">تقييم التعلم بذكاء</span>
-       </div>
-      </div>
-     </div>
-     <div class="flex justify-between mt-6">
-      <button onclick="goToPage(14)" class="text-gray-400 text-sm">⟩ السابق</button> <button onclick="goToPage(16); addPoints(10);" class="bg-actionYellow text-white font-bold px-6 py-2 rounded-full shadow hover:bg-yellow-500 transition">النهاية ⟨</button>
-     </div>
-    </div>
-   </div><!-- PAGE 16: Final / Congratulations -->
-   <div id="page16" class="page flex-col items-center justify-center h-full w-full fade-in" style="background: linear-gradient(135deg, #fefce8 0%, #f0fdf4 50%, #dbeafe 100%);">
-    <div class="max-w-lg mx-auto px-5 py-8 w-full text-center">
-     <div class="pop mb-4">
-      <div class="w-24 h-24 mx-auto badge-shimmer rounded-full flex items-center justify-center shadow-lg">
-       <span class="text-4xl">🏆</span>
-      </div>
-     </div>
-     <h2 id="congratsMsg" class="text-2xl font-black text-gray-800 mb-2">مبروك! أنت خبير الحاسوب 🎉</h2>
-     <p class="text-sm text-gray-500 mb-4">أكملت رحلة استكشاف مكونات الحاسوب</p>
-     <div class="bg-white/80 backdrop-blur rounded-2xl p-5 shadow-sm mb-6 inline-block">
-      <p class="text-sm text-gray-500 mb-1">مجموع النقاط</p>
-      <p id="finalScore" class="text-4xl font-black text-actionYellow">0</p>
-      <div class="mt-3">
-       <span class="bg-yellow-100 text-yellow-700 font-bold px-4 py-1 rounded-full text-sm">🏅 شارة: خبير الحاسوب</span>
-      </div>
-     </div><br><button onclick="resetAll()" class="bg-actionYellow hover:bg-yellow-500 text-white font-bold px-8 py-3 rounded-full shadow-lg text-sm transition hover:scale-105 active:scale-95"> أعد الرحلة من البداية 🔄 </button>
-    </div>
-   </div>
-  </div>
-  <script>
-// State
-let currentPage = 1;
-let totalPages = 16;
-let points = 0;
-let level = 1;
-const answeredQuestions = {};
 
-// Game state
-const gameDevices = [
-  { emoji:'⌨️', name:'لوحة المفاتيح', type:'input' },
-  { emoji:'🖱️', name:'الماوس', type:'input' },
-  { emoji:'🎤', name:'الميكروفون', type:'input' },
-  { emoji:'📷', name:'الكاميرا', type:'input' },
-  { emoji:'🖥️', name:'الشاشة', type:'output' },
-  { emoji:'🔊', name:'السماعات', type:'output' },
-  { emoji:'🖨️', name:'الطابعة', type:'output' },
-  { emoji:'📽️', name:'جهاز العرض', type:'output' },
-];
-let gameIndex = 0;
-let gameScore = 0;
-let gameOrder = [];
-
-function shuffleArray(a) { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
-
-function initGame() {
-  gameIndex = 0; gameScore = 0;
-  gameOrder = shuffleArray([...Array(gameDevices.length).keys()]);
-  showGameDevice();
-}
-
-function showGameDevice() {
-  if(gameIndex >= 8) {
-    document.getElementById('gameFeedback').textContent = '🎉 أحسنت! انتهت اللعبة';
-    document.getElementById('gameFeedback').className = 'text-sm font-bold mt-3 text-green-600';
-    addPoints(gameScore * 5);
-    return;
-  }
-  const d = gameDevices[gameOrder[gameIndex % gameOrder.length]];
-  document.getElementById('gameDevice').textContent = d.emoji;
-  document.getElementById('gameDeviceName').textContent = d.name;
-  document.getElementById('gameFeedback').textContent = '';
-  document.getElementById('gameRound').textContent = `الجولة: ${gameIndex+1}/8`;
-  document.getElementById('gameScore').textContent = `النقاط: ${gameScore}`;
-}
-
-function gameAnswer(type) {
-  const d = gameDevices[gameOrder[gameIndex % gameOrder.length]];
-  const fb = document.getElementById('gameFeedback');
-  if(type === d.type) {
-    gameScore++;
-    fb.textContent = '✅ أحسنت!';
-    fb.className = 'text-sm font-bold mt-3 text-green-600';
-  } else {
-    fb.textContent = '❌ حاول مرة أخرى';
-    fb.className = 'text-sm font-bold mt-3 text-red-500';
-  }
-  document.getElementById('gameScore').textContent = `النقاط: ${gameScore}`;
-  gameIndex++;
-  setTimeout(showGameDevice, 800);
-}
-
-function goToPage(n) {
-  document.getElementById('page'+currentPage).classList.remove('active');
-  currentPage = n;
-  const el = document.getElementById('page'+n);
-  el.classList.add('active');
-  el.classList.remove('fade-in');
-  void el.offsetWidth;
-  el.classList.add('fade-in');
-  updateProgress();
-  if(n === 13) initGame();
-}
-
-function showTopBar() { document.getElementById('topBar').style.display = 'flex'; }
-function hideTopBar() { document.getElementById('topBar').style.display = 'none'; }
-
-function updateProgress() {
-  const pct = Math.round(((currentPage-1)/(totalPages-1))*100);
-  document.getElementById('progressBar').style.width = pct+'%';
-  document.getElementById('pageIndicator').textContent = currentPage+'/'+totalPages;
-}
-
-function addPoints(n) {
-  points += n;
-  level = Math.floor(points / 30) + 1;
-  document.getElementById('pointsDisplay').textContent = '⭐ '+points+' نقطة';
-  document.getElementById('levelDisplay').textContent = 'المستوى '+level;
-  document.getElementById('finalScore').textContent = points;
-  // toast
-  const t = document.getElementById('pointsToast');
-  t.textContent = '+'+n+' ⭐';
-  t.style.display = 'block'; t.style.opacity = '1';
-  setTimeout(()=>{ t.style.opacity='0'; setTimeout(()=>{ t.style.display='none'; },300); },1200);
-}
-
-function checkAnswer(btn, qId, result) {
-  if(answeredQuestions[qId]) return;
-  answeredQuestions[qId] = true;
-  const fb = document.getElementById(qId+'feedback');
-  fb.style.display = 'block';
-  if(result === 'correct') {
-    btn.classList.add('border-green-500','bg-green-50');
-    fb.textContent = '✅ أحسنت! إجابة صحيحة';
-    fb.className = 'text-sm mt-2 font-bold text-center text-green-600';
-    addPoints(20);
-  } else {
-    btn.classList.add('border-red-400','bg-red-50');
-    fb.textContent = '❌ حاول مرة أخرى في المرة القادمة';
-    fb.className = 'text-sm mt-2 font-bold text-center text-red-500';
-  }
-  // disable all buttons in this question
-  const opts = document.getElementById(qId+'options');
-  opts.querySelectorAll('button').forEach(b => b.disabled = true);
-}
-
-function resetAll() {
-  points = 0; level = 1; gameIndex = 0; gameScore = 0;
-  Object.keys(answeredQuestions).forEach(k => delete answeredQuestions[k]);
-  document.getElementById('pointsDisplay').textContent = '⭐ 0 نقطة';
-  document.getElementById('levelDisplay').textContent = 'المستوى 1';
-  // Reset quiz buttons
-  ['q1','q2','q3'].forEach(qId => {
-    document.getElementById(qId+'feedback').style.display = 'none';
-    document.getElementById(qId+'options').querySelectorAll('button').forEach(b => {
-      b.disabled = false;
-      b.classList.remove('border-green-500','bg-green-50','border-red-400','bg-red-50');
-    });
-  });
-  // Reset drag and drop
-  resetDragDrop();
-  goToPage(1);
-  hideTopBar();
-}
-
-// Drag and Drop
-let draggedItem = null;
-let dragCorrectCount = 0;
-
-function initDragDrop() {
-  const items = document.querySelectorAll('.drag-item');
-  const zones = document.querySelectorAll('.drop-zone');
-
-  items.forEach(item => {
-    item.addEventListener('dragstart', e => {
-      draggedItem = item;
-      item.style.opacity = '0.5';
-      e.dataTransfer.effectAllowed = 'move';
-    });
-    item.addEventListener('dragend', () => {
-      item.style.opacity = '1';
-      draggedItem = null;
-      zones.forEach(z => z.classList.remove('drag-over'));
-    });
-    // Touch support
-    item.addEventListener('touchstart', e => { draggedItem = item; item.style.opacity = '0.5'; });
-    item.addEventListener('touchend', e => {
-      item.style.opacity = '1';
-      const touch = e.changedTouches[0];
-      const el = document.elementFromPoint(touch.clientX, touch.clientY);
-      const zone = el ? el.closest('.drop-zone') : null;
-      if(zone && draggedItem) handleDrop(zone);
-      draggedItem = null;
-      zones.forEach(z => z.classList.remove('drag-over'));
-    });
-  });
-
-  zones.forEach(zone => {
-    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); handleDrop(zone); });
-  });
-}
-
-function handleDrop(zone) {
-  if(!draggedItem) return;
-  const accept = zone.dataset.accept;
-  const type = draggedItem.dataset.type;
-  const fb = document.getElementById('dragFeedback');
-
-  if(type === accept) {
-    const container = zone.querySelector('div:last-child');
-    const clone = document.createElement('div');
-    clone.className = 'bg-white rounded-lg py-1 px-2 text-xs text-center shadow-sm';
-    clone.textContent = draggedItem.textContent;
-    container.appendChild(clone);
-    draggedItem.style.display = 'none';
-    dragCorrectCount++;
-    fb.style.display = 'block';
-    fb.textContent = '✅ صحيح!';
-    fb.className = 'text-center text-sm font-bold mt-3 text-green-600';
-    addPoints(10);
-    if(dragCorrectCount >= 6) {
-      fb.textContent = '🎉 ممتاز! أكملت التصنيف';
+    function showTopBar() {
+      document.getElementById("topBar").classList.remove("hidden");
+      document.getElementById("topBar").classList.add("flex");
     }
-  } else {
-    fb.style.display = 'block';
-    fb.textContent = '❌ حاول مرة أخرى';
-    fb.className = 'text-center text-sm font-bold mt-3 text-red-500';
-  }
-}
 
-function resetDragDrop() {
-  dragCorrectCount = 0;
-  document.querySelectorAll('.drag-item').forEach(i => i.style.display = '');
-  document.getElementById('inputZoneItems').innerHTML = '';
-  document.getElementById('outputZoneItems').innerHTML = '';
-  document.getElementById('dragFeedback').style.display = 'none';
-}
+    function hideTopBar() {
+      document.getElementById("topBar").classList.add("hidden");
+      document.getElementById("topBar").classList.remove("flex");
+    }
 
-// Element SDK
-const defaultConfig = {
-  site_title: 'رحلة استكشاف مكونات الحاسوب',
-  start_button_text: 'ابدأ الرحلة 🚀',
-  congrats_message: 'مبروك! أنت خبير الحاسوب 🎉',
-  background_color: '#f9fafb',
-  surface_color: '#ffffff',
-  text_color: '#1f2937',
-  primary_action_color: '#f59e0b',
-  secondary_action_color: '#3b82f6',
-  font_family: 'Noto Kufi Arabic',
-  font_size: 16
-};
+    function updateProgress() {
+      const pct = Math.round(((currentPage - 1) / (totalPages - 1)) * 100);
+      document.getElementById("progressBar").style.width = pct + "%";
+      document.getElementById("pageIndicator").textContent = currentPage + "/" + totalPages;
+    }
 
-function applyConfig(config) {
-  const c = { ...defaultConfig, ...config };
-  
-  const coverTitle = document.getElementById('coverTitle');
-  if(coverTitle) coverTitle.textContent = c.site_title;
-  
-  const startBtn = document.getElementById('startBtn');
-  if(startBtn) startBtn.textContent = c.start_button_text;
-  
-  const congratsMsg = document.getElementById('congratsMsg');
-  if(congratsMsg) congratsMsg.textContent = c.congrats_message;
+    function addPoints(num) {
+      points += num;
+      level = Math.floor(points / 30) + 1;
 
-  document.body.style.backgroundColor = c.background_color;
-  document.body.style.color = c.text_color;
+      document.getElementById("pointsDisplay").textContent = "⭐ " + points + " نقطة";
+      document.getElementById("levelDisplay").textContent = "🎖️ المستوى " + level;
+      document.getElementById("finalScore").textContent = points;
 
-  const font = c.font_family + ', sans-serif';
-  document.querySelectorAll('h1,h2,h3,p,span,button,div').forEach(el => {
-    el.style.fontFamily = font;
-  });
+      const toast = document.getElementById("pointsToast");
+      toast.textContent = "+" + num + " ⭐";
+      toast.classList.remove("hidden");
+      toast.style.opacity = "1";
 
-  const base = c.font_size || 16;
-  document.querySelectorAll('h1').forEach(el => el.style.fontSize = (base*2)+'px');
-  document.querySelectorAll('h2').forEach(el => el.style.fontSize = (base*1.35)+'px');
-  document.querySelectorAll('p').forEach(el => el.style.fontSize = base+'px');
-}
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => {
+          toast.classList.add("hidden");
+        }, 300);
+      }, 1200);
+    }
 
-if(window.elementSdk) {
-  window.elementSdk.init({
-    defaultConfig,
-    onConfigChange: async (config) => applyConfig(config),
-    mapToCapabilities: (config) => ({
-      recolorables: [
-        { get:()=>config.background_color||defaultConfig.background_color, set:(v)=>{config.background_color=v;window.elementSdk.setConfig({background_color:v});} },
-        { get:()=>config.surface_color||defaultConfig.surface_color, set:(v)=>{config.surface_color=v;window.elementSdk.setConfig({surface_color:v});} },
-        { get:()=>config.text_color||defaultConfig.text_color, set:(v)=>{config.text_color=v;window.elementSdk.setConfig({text_color:v});} },
-        { get:()=>config.primary_action_color||defaultConfig.primary_action_color, set:(v)=>{config.primary_action_color=v;window.elementSdk.setConfig({primary_action_color:v});} },
-        { get:()=>config.secondary_action_color||defaultConfig.secondary_action_color, set:(v)=>{config.secondary_action_color=v;window.elementSdk.setConfig({secondary_action_color:v});} },
-      ],
-      borderables: [],
-      fontEditable: { get:()=>config.font_family||defaultConfig.font_family, set:(v)=>{config.font_family=v;window.elementSdk.setConfig({font_family:v});} },
-      fontSizeable: { get:()=>config.font_size||defaultConfig.font_size, set:(v)=>{config.font_size=v;window.elementSdk.setConfig({font_size:v});} },
-    }),
-    mapToEditPanelValues: (config) => new Map([
-      ['site_title', config.site_title || defaultConfig.site_title],
-      ['start_button_text', config.start_button_text || defaultConfig.start_button_text],
-      ['congrats_message', config.congrats_message || defaultConfig.congrats_message],
-    ])
-  });
-}
+    function checkAnswer(button, qId, result) {
+      if (answeredQuestions[qId]) return;
+      answeredQuestions[qId] = true;
 
-// Init
-initDragDrop();
-updateProgress();
-</script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ebd57324174c951',t:'MTc3NjExMzQwMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
-</html>
+      const feedback = document.getElementById(qId + "feedback");
+      const options = document.getElementById(qId + "options");
+
+      feedback.classList.remove("hidden");
+
+      if (result === "correct") {
+        button.classList.add("border-green-500", "bg-green-50");
+        feedback.textContent = "✅ أحسنت! إجابة صحيحة";
+        feedback.className = "text-sm mt-2 font-bold text-center text-green-600";
+        addPoints(20);
+      } else {
+        button.classList.add("border-red-400", "bg-red-50");
+        feedback.textContent = "❌ حاول مرة أخرى في المرة القادمة";
+        feedback.className = "text-sm mt-2 font-bold text-center text-red-500";
+      }
+
+      options.querySelectorAll("button").forEach(btn => btn.disabled = true);
+    }
+
+    function initGame() {
+      gameIndex = 0;
+      gameScoreValue = 0;
+      gameOrder = shuffleArray([...Array(gameDevices.length).keys()]);
+      showGameDevice();
+    }
+
+    function showGameDevice() {
+      if (gameIndex >= 8) {
+        const feedback = document.getElementById("gameFeedback");
+        feedback.textContent = "🎉 أحسنت! انتهت اللعبة";
+        feedback.className = "text-sm font-bold mt-3 text-green-600";
+        addPoints(gameScoreValue * 5);
+        return;
+      }
+
+      const d = gameDevices[gameOrder[gameIndex % gameOrder.length]];
+      document.getElementById("gameDevice").textContent = d.emoji;
+      document.getElementById("gameDeviceName").textContent = d.name;
+      document.getElementById("gameFeedback").textContent = "";
+      document.getElementById("gameRound").textContent = "الجولة: " + (gameIndex + 1) + "/8";
+      document.getElementById("gameScore").textContent = "النقاط: " + gameScoreValue;
+    }
+
+    function gameAnswer(type) {
+      const d = gameDevices[gameOrder[gameIndex % gameOrder.length]];
+      const feedback = document.getElementById("gameFeedback");
+
+      if (type === d.type) {
+        gameScoreValue++;
+        feedback.textContent = "✅ أحسنت!";
+        feedback.className = "text-sm font-bold mt-3 text-green-600";
+      } else {
+        feedback.textContent = "❌ حاول مرة أخرى";
+        feedback.className = "text-sm font-bold mt-3 text-red-500";
+      }
+
+      document.getElementById("gameScore").textContent = "النقاط: " + gameScoreValue;
+      gameIndex++;
+      setTimeout(showGameDevice, 800);
+    }
+
+    function initDragDrop() {
+      const items = document.querySelectorAll(".drag-item");
+      const zones = document.querySelectorAll(".drop-zone");
+
+      items.forEach(item => {
+        item.addEventListener("dragstart", (e) => {
+          draggedItem = item;
+          item.style.opacity = "0.5";
+          e.dataTransfer.effectAllowed = "move";
+        });
+
+        item.addEventListener("dragend", () => {
+          item.style.opacity = "1";
+          draggedItem = null;
+          zones.forEach(zone => zone.classList.remove("drag-over"));
+        });
+      });
+
+      zones.forEach(zone => {
+        zone.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          zone.classList.add("drag-over");
+        });
+
+        zone.addEventListener("dragleave", () => {
+          zone.classList.remove("drag-over");
+        });
+
+        zone.addEventListener("drop", (e) => {
+          e.preventDefault();
+          zone.classList.remove("drag-over");
+          handleDrop(zone);
+        });
+      });
+    }
+
+    function handleDrop(zone) {
+      if (!draggedItem) return;
+
+      const accept = zone.dataset.accept;
+      const type = draggedItem.dataset.type;
+      const feedback = document.getElementById("dragFeedback");
+
+      if (type === accept) {
+        const container = zone.querySelector("div:last-child");
+        const clone = document.createElement("div");
+        clone.className = "bg-white rounded-lg py-1 px-2 text-xs text-center shadow-sm";
+        clone.textContent = draggedItem.textContent;
+        container.appendChild(clone);
+
+        draggedItem.style.display = "none";
+        dragCorrectCount++;
+
+        feedback.classList.remove("hidden");
+        feedback.textContent = "✅ صحيح!";
+        feedback.className = "text-center text-sm font-bold mt-3 text-green-600";
+
+        addPoints(10);
+
+        if (dragCorrectCount >= 6) {
+          feedback.textContent = "🎉 ممتاز! أكملت التصنيف";
+        }
+      } else {
+        feedback.classList.remove("hidden");
+        feedback.textContent = "❌ حاول مرة أخرى";
+        feedback.className = "text-center text-sm font-bold mt-3 text-red-500";
+      }
+    }
+
+    function resetDragDrop() {
+      dragCorrectCount = 0;
+      document.querySelectorAll(".drag-item").forEach(item => item.style.display = "");
+      document.getElementById("inputZoneItems").innerHTML = "";
+      document.getElementById("outputZoneItems").innerHTML = "";
+      const feedback = document.getElementById("dragFeedback");
+      feedback.classList.add("hidden");
+      feedback.textContent = "";
+    }
+
+    function resetAll() {
+      points = 0;
+      level = 1;
+      gameIndex = 0;
+      gameScoreValue = 0;
+
+      Object.keys(answeredQuestions).forEach(key => delete answeredQuestions[key]);
+
+      document.getElementById("pointsDisplay").textContent = "⭐ 0 نقطة";
+      document.getElementById("levelDisplay").textContent = "🎖️ المستوى 1";
+      document.getElementById("finalScore").textContent = "0";
+
+      ["q1", "q2", "q3"].forEach(qId => {
+        const feedback = document.getElementById(qId + "feedback");
+        const options = document.getElementById(qId + "options");
+
+        feedback.className = "text-sm mt-2 font-bold text-center hidden";
+        feedback.textContent = "";
+
+        options.querySelectorAll("button").forEach(btn => {
+          btn.disabled = false;
+          btn.classList.remove("border-green-500", "bg-green-50", "border-red-400", "bg-red-50");
+        });
+      });
+
+      resetDragDrop();
+      goToPage(1);
+      hideTopBar();
+      updateProgress();
+    }
+
+    initDragDrop();
+    updateProgress();
+  </script>
